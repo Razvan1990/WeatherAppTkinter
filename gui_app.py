@@ -5,6 +5,7 @@ from tkinter import messagebox
 import requests
 from tkinter import *
 from PIL import Image, ImageTk
+from datetime import datetime
 
 import constants
 
@@ -15,7 +16,8 @@ class WeatherGui:
         self.pictures_folder = os.path.join(os.getcwd(), "images")
         self.dict_images = {
             # to check if this is what the requests offer us
-            "Clear": os.path.join(self.pictures_folder, "sunny.png"),
+            "ClearDay": os.path.join(self.pictures_folder, "sunny.png"),
+            "ClearNight": os.path.join(self.pictures_folder, "moon.png"),
             "Rain": os.path.join(self.pictures_folder, "rainy.png"),
             "Snow": os.path.join(self.pictures_folder, "snowy.png"),
             "Clouds": os.path.join(self.pictures_folder, "cloudy.png")
@@ -59,10 +61,21 @@ class WeatherGui:
         city = self.split_label(label_city_selection["text"])
         # appeal the function to get weather
         weather_condition, temp = self.get_weather(city)
-        print(weather_condition)
+        date = datetime.now()
+        hour = date.hour
+        print(type(hour))
         # change the canvas based on the conditions
-        if weather_condition == "Clear":
-            image = Image.open(self.dict_images["Clear"])
+        if weather_condition == "Clear" and (5 < hour < 19):
+            image = Image.open(self.dict_images["ClearDay"])
+            image = ImageTk.PhotoImage(image.resize((220, 200)))
+            canvas.itemconfig(init_image, image=image)
+            string_label_city = city.capitalize() + ", " + str(temp) + "deg C " + ", " + weather_condition
+            label_city_selection["text"] = string_label_city
+            # clear search
+            city_search_entry.delete(0, END)
+            search_button["state"] = tkinter.DISABLED
+        elif weather_condition == "Clear" and (hour > 19 or hour < 5):
+            image = Image.open(self.dict_images["ClearNight"])
             image = ImageTk.PhotoImage(image.resize((220, 200)))
             canvas.itemconfig(init_image, image=image)
             string_label_city = city.capitalize() + ", " + str(temp) + "deg C " + ", " + weather_condition
@@ -98,16 +111,16 @@ class WeatherGui:
             city_search_entry.delete(0, END)
             search_button["state"] = tkinter.DISABLED
 
-
     def get_actual_weather(self):
         global image
         city = city_search_entry.get()
         # appeal the function to get weather
         weather_condition, temp = self.get_weather(city)
-        print(weather_condition)
+        date = datetime.now()
+        hour = date.hour
         # change the canvas based on the conditions
-        if weather_condition == "Clear":
-            image = Image.open(self.dict_images["Clear"])
+        if weather_condition == "Clear" and (5 < hour < 19):
+            image = Image.open(self.dict_images["ClearDay"])
             image = ImageTk.PhotoImage(image.resize((220, 200)))
             canvas.itemconfig(init_image, image=image)
             string_label_city = city.capitalize() + ", " + str(temp) + "deg C " + ", " + weather_condition
@@ -115,7 +128,16 @@ class WeatherGui:
             # clear search
             city_search_entry.delete(0, END)
             search_button["state"] = tkinter.DISABLED
-            #enable also the referesh button now as we have something on the screen
+            refresh_button["state"] = tkinter.NORMAL
+        elif weather_condition == "Clear" and (hour > 19 or hour < 5):
+            image = Image.open(self.dict_images["ClearNight"])
+            image = ImageTk.PhotoImage(image.resize((220, 200)))
+            canvas.itemconfig(init_image, image=image)
+            string_label_city = city.capitalize() + ", " + str(temp) + "deg C " + ", " + weather_condition
+            label_city_selection["text"] = string_label_city
+            # clear search
+            city_search_entry.delete(0, END)
+            search_button["state"] = tkinter.DISABLED
             refresh_button["state"] = tkinter.NORMAL
         elif weather_condition == "Rain":
             image = Image.open(self.dict_images["Rain"])
