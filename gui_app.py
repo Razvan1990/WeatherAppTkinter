@@ -119,7 +119,7 @@ class WeatherGui:
         date = datetime.now()
         hour = date.hour
         # change the canvas based on the conditions
-        if weather_condition == "Clear" and (5 < hour < 19):
+        if weather_condition == "Clear" and (5 < hour <= 19):
             image = Image.open(self.dict_images["ClearDay"])
             image = ImageTk.PhotoImage(image.resize((220, 200)))
             canvas.itemconfig(init_image, image=image)
